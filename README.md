@@ -95,7 +95,7 @@ Virtual University of Pakistan
 This project is developed as a Final Year Project for academic purposes.
 All rights reserved.
 
-🙏 Acknowledgments
+** Acknowledgments
 Supervisor: Asadullah
 
 Virtual University of Pakistan – Software Projects & Research Section
