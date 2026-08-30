@@ -1,4 +1,3 @@
-
 import os
 import sys
 import sqlite3
@@ -57,40 +56,40 @@ def init_db():
 
     c.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            role TEXT NOT NULL,
-            created_at TEXT NOT NULL
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL,
+        created_at TEXT NOT NULL
         )
     """)
     c.execute("""
         CREATE TABLE IF NOT EXISTS items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            item_code TEXT UNIQUE NOT NULL,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL,
-            season TEXT NOT NULL,
-            size TEXT,
-            color TEXT,
-            quantity INTEGER NOT NULL DEFAULT 0,
-            purchase_price REAL NOT NULL,
-            sale_price REAL NOT NULL,
-            image_path TEXT,
-            created_at TEXT NOT NULL
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_code TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        season TEXT NOT NULL,
+        size TEXT,
+        color TEXT,
+        quantity INTEGER NOT NULL DEFAULT 0,
+        purchase_price REAL NOT NULL,
+        sale_price REAL NOT NULL,
+        image_path TEXT,
+        created_at TEXT NOT NULL
         )
     """)
     c.execute("""
         CREATE TABLE IF NOT EXISTS transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            item_id INTEGER NOT NULL,
-            txn_type TEXT NOT NULL,
-            quantity INTEGER NOT NULL,
-            unit_price REAL NOT NULL,
-            total_price REAL NOT NULL,
-            txn_date TEXT NOT NULL,
-            performed_by TEXT NOT NULL,
-            FOREIGN KEY(item_id) REFERENCES items(id)
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id INTEGER NOT NULL,
+        txn_type TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        unit_price REAL NOT NULL,
+        total_price REAL NOT NULL,
+        txn_date TEXT NOT NULL,
+        performed_by TEXT NOT NULL,
+        FOREIGN KEY(item_id) REFERENCES items(id)
         )
     """)
     conn.commit()
@@ -100,8 +99,8 @@ def init_db():
         default_admin = "admin"
         default_pass  = "admin123"
         c.execute("INSERT INTO users (username,password,role,created_at) VALUES (?,?,?,?)",
-                  (default_admin, hash_password(default_admin, default_pass),
-                   'admin', datetime.now().isoformat()))
+        (default_admin, hash_password(default_admin, default_pass),
+        'admin', datetime.now().isoformat()))
         conn.commit()
         print(f"Default admin created – Username: '{default_admin}', Password: '{default_pass}'")
 
@@ -152,7 +151,7 @@ def register_user_by_admin(admin_username, username, password, role='staff'):
     c = conn.cursor()
     try:
         c.execute("INSERT INTO users (username,password,role,created_at) VALUES (?,?,?,?)",
-                  (username, hash_password(username, password), role, datetime.now().isoformat()))
+        (username, hash_password(username, password), role, datetime.now().isoformat()))
         conn.commit()
         return True, "User created successfully."
     except sqlite3.IntegrityError:
@@ -178,7 +177,7 @@ def change_password(username, old_password, new_password):
     conn = get_connection()
     c = conn.cursor()
     c.execute("UPDATE users SET password=? WHERE username=?",
-              (hash_password(username, new_password), username))
+        (hash_password(username, new_password), username))
     conn.commit()
     conn.close()
     return True, "Password changed successfully."
@@ -200,7 +199,7 @@ def delete_user(user_id):
     return True, "User deleted successfully."
 
 def add_item(name, category, season, size, color, quantity,
-             purchase_price, sale_price, image_path=None, item_code=None):
+            purchase_price, sale_price, image_path=None, item_code=None):
     if not item_code:
         item_code = generate_item_code(name)
     conn = get_connection()
@@ -208,10 +207,10 @@ def add_item(name, category, season, size, color, quantity,
     try:
         c.execute("""INSERT INTO items
             (item_code,name,category,season,size,color,quantity,
-             purchase_price,sale_price,image_path,created_at)
+            purchase_price,sale_price,image_path,created_at)
             VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
-                  (item_code,name,category,season,size,color,quantity,
-                   purchase_price,sale_price,image_path,datetime.now().isoformat()))
+                (item_code,name,category,season,size,color,quantity,
+                purchase_price,sale_price,image_path,datetime.now().isoformat()))
         conn.commit()
         return True, f"Item '{name}' added successfully."
     except sqlite3.IntegrityError:
@@ -224,10 +223,10 @@ def update_item(item_id, name, category, season, size, color,
     conn = get_connection()
     c = conn.cursor()
     c.execute("""UPDATE items SET name=?,category=?,season=?,size=?,color=?,
-                 quantity=?,purchase_price=?,sale_price=?,image_path=?
-                 WHERE id=?""",
-              (name,category,season,size,color,quantity,
-               purchase_price,sale_price,image_path,item_id))
+                quantity=?,purchase_price=?,sale_price=?,image_path=?
+                WHERE id=?""",
+            (name,category,season,size,color,quantity,
+            purchase_price,sale_price,image_path,item_id))
     conn.commit()
     conn.close()
     return True, "Item updated successfully."
@@ -246,12 +245,12 @@ def delete_item(item_id):
     return True, "Item deleted successfully."
 
 def search_items(term=None, category_filter=None, season_filter=None,
-                 color_filter=None, size_filter=None):
+            color_filter=None, size_filter=None):
     conn = get_connection()
     c = conn.cursor()
     query = """SELECT id,item_code,name,category,season,size,color,
-               quantity,purchase_price,sale_price,image_path,created_at
-               FROM items WHERE 1=1"""
+        quantity,purchase_price,sale_price,image_path,created_at
+        FROM items WHERE 1=1"""
     params = []
     if term:
         query += " AND (name LIKE ? OR item_code LIKE ? OR category LIKE ? OR color LIKE ? OR size LIKE ?)"
@@ -275,8 +274,8 @@ def get_stock_summary():
     conn = get_connection()
     c = conn.cursor()
     c.execute("""SELECT item_code,name,category,season,size,color,
-                 quantity,purchase_price,sale_price
-                 FROM items ORDER BY quantity ASC""")
+                quantity,purchase_price,sale_price
+                FROM items ORDER BY quantity ASC""")
     rows = c.fetchall()
     conn.close()
     return rows
@@ -297,9 +296,9 @@ def record_transaction(item_id, txn_type, quantity, unit_price, performed_by, tx
     total_price = quantity * unit_price
     try:
         c.execute("""INSERT INTO transactions
-            (item_id,txn_type,quantity,unit_price,total_price,txn_date,performed_by)
-            VALUES (?,?,?,?,?,?,?)""",
-                  (item_id,txn_type,quantity,unit_price,total_price,txn_date,performed_by))
+        (item_id,txn_type,quantity,unit_price,total_price,txn_date,performed_by)
+        VALUES (?,?,?,?,?,?,?)""",
+        (item_id,txn_type,quantity,unit_price,total_price,txn_date,performed_by))
         c.execute("UPDATE items SET quantity=? WHERE id=?", (new_qty, item_id))
         conn.commit()
         return True, f"{txn_type.capitalize()} recorded successfully."
@@ -309,95 +308,138 @@ def record_transaction(item_id, txn_type, quantity, unit_price, performed_by, tx
         conn.close()
 
 def generate_report(interval='daily', start_date=None, end_date=None):
+    """
+    Generate report with correct Gross Profit calculation.
+    Profit = total_sales - total_COGS (cost of goods sold)
+    COGS is computed using the item's purchase_price at the time of sale.
+    """
     conn = get_connection()
     c = conn.cursor()
-    query = """SELECT t.id,t.item_id,i.item_code,i.name,t.txn_type,
-               t.quantity,t.unit_price,t.total_price,t.txn_date,t.performed_by
-               FROM transactions t JOIN items i ON t.item_id=i.id WHERE 1=1"""
+    query = """
+        SELECT t.id, t.item_id, i.item_code, i.name, t.txn_type,
+               t.quantity, t.unit_price, t.total_price, t.txn_date, t.performed_by,
+               i.purchase_price
+        FROM transactions t
+        JOIN items i ON t.item_id = i.id
+        WHERE 1=1
+    """
     params = []
     today = date.today()
 
     if interval == 'daily':
-        s = datetime(today.year,today.month,today.day)
-        e = datetime(today.year,today.month,today.day,23,59,59)
-        query += " AND txn_date BETWEEN ? AND ?"; params.extend([s.isoformat(),e.isoformat()])
+        s = datetime(today.year, today.month, today.day)
+        e = datetime(today.year, today.month, today.day, 23, 59, 59)
+        query += " AND txn_date BETWEEN ? AND ?"
+        params.extend([s.isoformat(), e.isoformat()])
     elif interval == 'weekly':
         week_start = today - timedelta(days=today.weekday())
         week_end   = week_start + timedelta(days=6)
-        s = datetime(week_start.year,week_start.month,week_start.day)
-        e = datetime(week_end.year,week_end.month,week_end.day,23,59,59)
-        query += " AND txn_date BETWEEN ? AND ?"; params.extend([s.isoformat(),e.isoformat()])
+        s = datetime(week_start.year, week_start.month, week_start.day)
+        e = datetime(week_end.year, week_end.month, week_end.day, 23, 59, 59)
+        query += " AND txn_date BETWEEN ? AND ?"
+        params.extend([s.isoformat(), e.isoformat()])
     elif interval == 'monthly':
-        s = datetime(today.year,today.month,1)
-        last_day = calendar.monthrange(today.year,today.month)[1]
-        e = datetime(today.year,today.month,last_day,23,59,59)
-        query += " AND txn_date BETWEEN ? AND ?"; params.extend([s.isoformat(),e.isoformat()])
+        s = datetime(today.year, today.month, 1)
+        last_day = calendar.monthrange(today.year, today.month)[1]
+        e = datetime(today.year, today.month, last_day, 23, 59, 59)
+        query += " AND txn_date BETWEEN ? AND ?"
+        params.extend([s.isoformat(), e.isoformat()])
     elif interval == 'yearly':
-        s = datetime(today.year,1,1)
-        e = datetime(today.year,12,31,23,59,59)
-        query += " AND txn_date BETWEEN ? AND ?"; params.extend([s.isoformat(),e.isoformat()])
+        s = datetime(today.year, 1, 1)
+        e = datetime(today.year, 12, 31, 23, 59, 59)
+        query += " AND txn_date BETWEEN ? AND ?"
+        params.extend([s.isoformat(), e.isoformat()])
     elif interval == 'custom':
         if not start_date or not end_date:
             conn.close()
-            return {"error":"Start date and end date are required for custom range"}
+            return {"error": "Start date and end date are required for custom range"}
         s = datetime.combine(start_date, datetime.min.time())
-        e = datetime.combine(end_date,   datetime.max.time())
-        query += " AND txn_date BETWEEN ? AND ?"; params.extend([s.isoformat(),e.isoformat()])
+        e = datetime.combine(end_date, datetime.max.time())
+        query += " AND txn_date BETWEEN ? AND ?"
+        params.extend([s.isoformat(), e.isoformat()])
 
     query += " ORDER BY t.txn_date"
     c.execute(query, params)
     rows = c.fetchall()
 
-    total_purchases = total_sales = 0.0
-    qty_purchased = qty_sold = 0
+    total_sales = 0.0
+    total_purchases = 0.0
+    total_COGS = 0.0
+    qty_sold = 0
+    qty_purchased = 0
     per_item = {}
 
     for row in rows:
-        _,_,item_code,name,txn_type,quantity,_,total_price,_,_ = row
-        if txn_type == 'purchase':
-            total_purchases += total_price; qty_purchased += quantity
-        else:
-            total_sales += total_price; qty_sold += quantity
+        # row: (id, item_id, item_code, name, txn_type, quantity,
+        #       unit_price, total_price, txn_date, performed_by, purchase_price)
+        (_, _, item_code, name, txn_type,
+         quantity, unit_price, total_price, _, _, purchase_price) = row
+
         key = f"{item_code} - {name}"
         if key not in per_item:
-            per_item[key] = {"purchased":0,"purchase_total":0.0,"sold":0,"sale_total":0.0}
-        if txn_type == 'purchase':
-            per_item[key]["purchased"] += quantity
-            per_item[key]["purchase_total"] += total_price
-        else:
+            per_item[key] = {
+                "purchased": 0,
+                "purchase_total": 0.0,
+                "sold": 0,
+                "sale_total": 0.0,
+                "cogs": 0.0
+            }
+
+        if txn_type == 'sale':
+            total_sales += total_price
+            qty_sold += quantity
+            cogs = quantity * purchase_price
+            total_COGS += cogs
             per_item[key]["sold"] += quantity
             per_item[key]["sale_total"] += total_price
+            per_item[key]["cogs"] += cogs
+        elif txn_type == 'purchase':
+            total_purchases += total_price
+            qty_purchased += quantity
+            per_item[key]["purchased"] += quantity
+            per_item[key]["purchase_total"] += total_price
+
+    profit = total_sales - total_COGS   # Gross Profit
 
     conn.close()
     return {
         "transactions": rows,
-        "total_purchases": total_purchases,
         "total_sales": total_sales,
+        "total_purchases": total_purchases,
+        "total_COGS": total_COGS,
+        "profit": profit,
         "qty_purchased": qty_purchased,
         "qty_sold": qty_sold,
-        "profit": total_sales - total_purchases,
         "per_item": per_item,
     }
 
 def export_report_csv(report_dict, filename):
-    with open(filename,'w',newline='',encoding='utf-8') as f:
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
         w.writerow(["Clothes Management System – Report"])
         w.writerow([])
         w.writerow(["Summary"])
-        w.writerow(["Total Purchases", f"${report_dict.get('total_purchases',0):.2f}"])
-        w.writerow(["Total Sales",     f"${report_dict.get('total_sales',0):.2f}"])
-        w.writerow(["Qty Purchased",   report_dict.get('qty_purchased',0)])
-        w.writerow(["Qty Sold",        report_dict.get('qty_sold',0)])
-        w.writerow(["Profit/Loss",     f"${report_dict.get('profit',0):.2f}"])
+        w.writerow(["Total Sales", f"${report_dict.get('total_sales',0):.2f}"])
+        w.writerow(["Total COGS (Cost of Goods Sold)", f"${report_dict.get('total_COGS',0):.2f}"])
+        w.writerow(["Gross Profit", f"${report_dict.get('profit',0):.2f}"])
+        w.writerow(["Qty Purchased", report_dict.get('qty_purchased',0)])
+        w.writerow(["Qty Sold", report_dict.get('qty_sold',0)])
+        w.writerow(["Total Purchases (for info)", f"${report_dict.get('total_purchases',0):.2f}"])
         w.writerow([])
         w.writerow(["Per Item Breakdown"])
-        w.writerow(["Item","Purchased Qty","Purchased Total","Sold Qty","Sold Total"])
+        w.writerow(["Item", "Purchased Qty", "Purchased Total",
+                    "Sold Qty", "Sale Total", "COGS", "Profit"])
         for item, vals in report_dict.get('per_item',{}).items():
-            w.writerow([item,vals.get('purchased',0),
-                        f"${vals.get('purchase_total',0):.2f}",
-                        vals.get('sold',0),
-                        f"${vals.get('sale_total',0):.2f}"])
+            profit_item = vals.get('sale_total',0) - vals.get('cogs',0)
+            w.writerow([
+                item,
+                vals.get('purchased',0),
+                f"${vals.get('purchase_total',0):.2f}",
+                vals.get('sold',0),
+                f"${vals.get('sale_total',0):.2f}",
+                f"${vals.get('cogs',0):.2f}",
+                f"${profit_item:.2f}"
+            ])
 
 def export_stock_csv(filename):
     rows = get_stock_summary()
@@ -417,7 +459,7 @@ def print_text_report(text_content, title="Report"):
     """Print report by writing a temp text file and opening it with the OS default handler."""
     try:
         with tempfile.NamedTemporaryFile(mode='w', suffix='.txt',
-                                         delete=False, encoding='utf-8') as f:
+                                    delete=False, encoding='utf-8') as f:
             f.write(text_content)
             tmp = f.name
         if sys.platform.startswith('win'):
@@ -432,31 +474,35 @@ def print_text_report(text_content, title="Report"):
 
 def build_report_text(report_dict, title="Report"):
     lines = [
-        "=" * 60,
+        "=" * 70,
         f"  CLOTHES MANAGEMENT SYSTEM – {title.upper()}",
         f"  Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        "=" * 60, "",
+        "=" * 70, "",
         "FINANCIAL SUMMARY",
-        f"  Total Sales    : ${report_dict.get('total_sales',0):>10.2f}",
-        f"  Total Purchases: ${report_dict.get('total_purchases',0):>10.2f}",
-        f"  Net Profit     : ${report_dict.get('profit',0):>10.2f}",
+        f"  Total Sales      : ${report_dict.get('total_sales',0):>10.2f}",
+        f"  Total COGS       : ${report_dict.get('total_COGS',0):>10.2f}",
+        f"  Gross Profit     : ${report_dict.get('profit',0):>10.2f}",
+        f"  Total Purchases  : ${report_dict.get('total_purchases',0):>10.2f}  (info only)",
         "",
         "INVENTORY MOVEMENT",
         f"  Qty Sold      : {report_dict.get('qty_sold',0)}",
         f"  Qty Purchased : {report_dict.get('qty_purchased',0)}",
         "",
         "PER ITEM BREAKDOWN",
-        f"  {'Item':<35} {'Sold':>6} {'Sale $':>10} {'Bought':>6} {'Buy $':>10}",
-        "-" * 75,
+        f"  {'Item':<35} {'Sold':>6} {'Sale $':>10} {'Bought':>6} {'Buy $':>10} {'COGS $':>10} {'Profit $':>10}",
+        "-" * 90,
     ]
     for item, vals in report_dict.get('per_item',{}).items():
+        profit_item = vals.get('sale_total',0) - vals.get('cogs',0)
         lines.append(
             f"  {item:<35} {vals.get('sold',0):>6} "
             f"${vals.get('sale_total',0):>9.2f} "
             f"{vals.get('purchased',0):>6} "
-            f"${vals.get('purchase_total',0):>9.2f}"
+            f"${vals.get('purchase_total',0):>9.2f} "
+            f"${vals.get('cogs',0):>9.2f} "
+            f"${profit_item:>9.2f}"
         )
-    lines += ["", "=" * 60]
+    lines += ["", "=" * 70]
     return "\n".join(lines)
 
 def build_stock_report_text():
@@ -483,7 +529,7 @@ class StyledButton(tk.Button):
     def __init__(self, parent, **kwargs):
         tk.Button.__init__(self, parent, **kwargs)
         self.configure(bg=BUTTON_BG,fg=BUTTON_FG,relief='raised',
-                       padx=10,pady=5,font=('Arial',10))
+                padx=10,pady=5,font=('Arial',10))
 
 class SuccessButton(StyledButton):
     def __init__(self, parent, **kwargs):
@@ -529,7 +575,7 @@ class ClothesManagementSystem(tk.Tk):
         top_bar.pack_propagate(False)
 
         tk.Label(top_bar, text="👕 Clothes Management System",
-                 bg=HEADER_BG, fg=HEADER_FG, font=("Helvetica",16,"bold")).pack(side='left',padx=20)
+                bg=HEADER_BG, fg=HEADER_FG, font=("Helvetica",16,"bold")).pack(side='left',padx=20)
 
         # Low-stock alert badge (top bar, right side)
         self.alert_label = tk.Label(top_bar, text="", bg=WARNING_BG, fg="white",
@@ -537,13 +583,13 @@ class ClothesManagementSystem(tk.Tk):
         self.alert_label.pack(side='right', padx=10)
 
         self.user_label = tk.Label(top_bar, text="Not logged in",
-                                   bg=HEADER_BG, fg=HEADER_FG, font=("Arial",10))
+                                bg=HEADER_BG, fg=HEADER_FG, font=("Arial",10))
         self.user_label.pack(side='right', padx=20)
 
         tk.Button(top_bar, text="Logout", command=self.logout,
-                  bg=DANGER_BG, fg="white", relief='flat').pack(side='right', padx=5)
+                bg=DANGER_BG, fg="white", relief='flat').pack(side='right', padx=5)
         tk.Button(top_bar, text="Change Password", command=self.change_password,
-                  bg=BUTTON_BG, fg="white", relief='flat').pack(side='right', padx=5)
+                bg=BUTTON_BG, fg="white", relief='flat').pack(side='right', padx=5)
 
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill='both', expand=True, padx=10, pady=10)
@@ -586,8 +632,8 @@ class ClothesManagementSystem(tk.Tk):
 
         # Default credentials hint
         tk.Label(login_frame,
-                 text=" Staff accounts created by admin in User Management tab",
-                 bg=FRAME_BG, fg="gray", font=('Arial',9)).grid(
+                text=" Staff accounts created by admin in User Management tab",
+                bg=FRAME_BG, fg="gray", font=('Arial',9)).grid(
             row=3,column=0,columnspan=2,pady=(0,8))
 
         return tab
@@ -714,16 +760,16 @@ class ClothesManagementSystem(tk.Tk):
 
         tk.Label(ctrl,text="From:",bg=FRAME_BG).pack(side='left',padx=(20,5))
         self.start_date = tk.Entry(ctrl,width=12,font=('Arial',10),
-                                   state='disabled',disabledbackground="#e0e0e0",
-                                   disabledforeground="#aaaaaa")
+                state='disabled',disabledbackground="#e0e0e0",
+                            disabledforeground="#aaaaaa")
         self.start_date.pack(side='left')
         tk.Label(ctrl,text="To:",bg=FRAME_BG).pack(side='left',padx=(10,5))
         self.end_date = tk.Entry(ctrl,width=12,font=('Arial',10),
-                                 state='disabled',disabledbackground="#e0e0e0",
-                                 disabledforeground="#aaaaaa")
+                        state='disabled',disabledbackground="#e0e0e0",
+                            disabledforeground="#aaaaaa")
         self.end_date.pack(side='left')
         tk.Label(ctrl,text="(YYYY-MM-DD, Custom only)",bg=FRAME_BG,
-                 fg="gray",font=('Arial',8)).pack(side='left',padx=(6,0))
+            fg="gray",font=('Arial',8)).pack(side='left',padx=(6,0))
 
         StyledButton(ctrl, text="Generate", command=self.generate_report).pack(side='left',padx=10)
         SuccessButton(ctrl, text="Export CSV", command=self.export_report).pack(side='left')
@@ -824,7 +870,7 @@ class ClothesManagementSystem(tk.Tk):
         StyledButton(uf,text="🔄 Refresh",command=self.load_users).pack(side='left',padx=5)
         DangerButton(uf,text="🗑️ Delete Selected",command=self.delete_selected_user).pack(side='left',padx=5)
         tk.Label(uf,text="(Cannot delete the currently logged-in admin)",
-                 bg=FRAME_BG,fg="gray",font=('Arial',9)).pack(side='left',padx=10)
+                bg=FRAME_BG,fg="gray",font=('Arial',9)).pack(side='left',padx=10)
 
         utf = StyledFrame(ul_frame); utf.pack(fill='both',expand=True,padx=10,pady=10)
         ucols = ("ID","Username","Role","Created At")
@@ -944,7 +990,7 @@ class ClothesManagementSystem(tk.Tk):
             self.alert_label.config(text="", bg=HEADER_BG)
 
     def load_items(self, search_term=None, category=None, season=None,
-                   color=None, size=None):
+                color=None, size=None):
         for item in self.items_tree.get_children():
             self.items_tree.delete(item)
         items = search_items(search_term, category, season, color, size)
@@ -963,8 +1009,8 @@ class ClothesManagementSystem(tk.Tk):
         conn = get_connection()
         c = conn.cursor()
         c.execute("""SELECT t.txn_type,i.name,t.quantity,t.total_price,t.txn_date,t.performed_by
-                     FROM transactions t JOIN items i ON t.item_id=i.id
-                     ORDER BY t.txn_date DESC LIMIT ?""", (limit,))
+                    FROM transactions t JOIN items i ON t.item_id=i.id
+                    ORDER BY t.txn_date DESC LIMIT ?""", (limit,))
         for row in c.fetchall():
             ds = datetime.fromisoformat(row[4]).strftime("%m/%d %H:%M")
             self.txn_tree.insert('','end', values=(
@@ -1074,7 +1120,7 @@ class ClothesManagementSystem(tk.Tk):
         if self.active_role != 'admin':
             messagebox.showerror("Permission Denied","Only administrators can delete items"); return
         if messagebox.askyesno("Confirm Delete",
-                               f"Delete '{self.selected_item['name']}'?", icon='warning'):
+                            f"Delete '{self.selected_item['name']}'?", icon='warning'):
             ok, msg = delete_item(self.selected_item['id'])
             if ok: messagebox.showinfo("Success",msg); self.refresh_data()
             else:  messagebox.showerror("Error",msg)
@@ -1105,8 +1151,8 @@ class ClothesManagementSystem(tk.Tk):
                 entry.delete(0, tk.END)
                 entry.insert(0, "YYYY-MM-DD")
                 entry.config(state='disabled',
-                             disabledbackground="#e0e0e0",
-                             disabledforeground="#aaaaaa")
+                            disabledbackground="#e0e0e0",
+                            disabledforeground="#aaaaaa")
 
     def _get_report(self):
         period = self.report_period.get().lower()
@@ -1130,17 +1176,19 @@ class ClothesManagementSystem(tk.Tk):
 
         self.summary_text.delete('1.0',tk.END)
         summary = (f"📊 {period_label} Report Summary\n\n"
-                   f"💵 Financial:\n"
-                   f"  Total Sales:     ${report['total_sales']:.2f}\n"
-                   f"  Total Purchases: ${report['total_purchases']:.2f}\n"
-                   f"  Net Profit:      ${report['profit']:.2f}\n\n"
-                   f"📦 Movement:\n"
-                   f"  Qty Sold:        {report['qty_sold']} units\n"
-                   f"  Qty Purchased:   {report['qty_purchased']} units\n\n"
-                   f"📈 Per Item:\n")
+                f"💵 Financial:\n"
+                f"  Total Sales:     ${report['total_sales']:.2f}\n"
+                f"  Total COGS:      ${report['total_COGS']:.2f}\n"
+                f"  Gross Profit:    ${report['profit']:.2f}\n"
+                f"  (Total Purchases: ${report['total_purchases']:.2f} for info)\n\n"
+                f"📦 Movement:\n"
+                f"  Qty Sold:        {report['qty_sold']} units\n"
+                f"  Qty Purchased:   {report['qty_purchased']} units\n\n"
+                f"📈 Per Item:\n")
         for item,data in report['per_item'].items():
+            profit_item = data['sale_total'] - data['cogs']
             summary += (f"  {item}: Sold {data['sold']} (${data['sale_total']:.2f}), "
-                        f"Purchased {data['purchased']} (${data['purchase_total']:.2f})\n")
+                        f"COGS ${data['cogs']:.2f}, Profit ${profit_item:.2f}\n")
         self.summary_text.insert('1.0',summary)
 
         for item in self.report_tree.get_children():
@@ -1222,7 +1270,7 @@ class ItemDialog(tk.Toplevel):
                     w.bind('<KeyRelease>', self.calc_profit)
             elif wtype == 'readonly':
                 w = tk.Entry(mf,width=30,font=('Arial',10),state='readonly',
-                             readonlybackground="#e8f8e8",fg=SUCCESS_BG)
+                            readonlybackground="#e8f8e8",fg=SUCCESS_BG)
                 w.grid(row=i,column=1,pady=4,padx=(10,0),sticky='we')
             elif wtype == 'combo':
                 w = ttk.Combobox(mf,values=opts,state="readonly",width=28)
@@ -1302,7 +1350,7 @@ class ItemDialog(tk.Toplevel):
 
         if self.item_data:
             ok, msg = update_item(self.item_data['id'],name,category,season,size,color,
-                                  quantity,pp,sp,image_path)
+                    quantity,pp,sp,image_path)
         else:
             ok, msg = add_item(name,category,season,size,color,quantity,pp,sp,image_path)
 
@@ -1325,11 +1373,11 @@ class TransactionDialog(tk.Toplevel):
     def create_widgets(self):
         mf = StyledFrame(self); mf.pack(fill='both',expand=True,padx=20,pady=20)
         tk.Label(mf,text=f"Record {self.txn_type.capitalize()}",
-                 font=("Helvetica",14,"bold"),bg=FRAME_BG).pack(pady=(0,12))
+                font=("Helvetica",14,"bold"),bg=FRAME_BG).pack(pady=(0,12))
 
         inf = StyledFrame(mf); inf.pack(fill='x',pady=8)
         tk.Label(inf,text=f"Item: {self.item_data['name']}",
-                 font=("Helvetica",12,"bold"),bg=FRAME_BG).pack(anchor='w')
+                font=("Helvetica",12,"bold"),bg=FRAME_BG).pack(anchor='w')
         qty = self.item_data['quantity']
         color = DANGER_BG if qty == 0 else (WARNING_BG if qty <= LOW_STOCK_QTY else "black")
         tk.Label(inf,text=f"Current Stock: {qty} units",bg=FRAME_BG,fg=color).pack(anchor='w',pady=(4,0))
@@ -1340,7 +1388,7 @@ class TransactionDialog(tk.Toplevel):
         self.qty_entry.grid(row=0,column=1,pady=8,padx=(10,0),sticky='we')
 
         default_price = (self.item_data['purchase_price'] if self.txn_type == 'purchase'
-                         else self.item_data['sale_price'])
+                        else self.item_data['sale_price'])
         tk.Label(inp,text="Unit Price ($):",font=("Helvetica",10),bg=FRAME_BG).grid(row=1,column=0,sticky='w',pady=8)
         self.price_entry = tk.Entry(inp,width=20,font=("Helvetica",10))
         self.price_entry.insert(0,f"{default_price:.2f}")
@@ -1351,9 +1399,9 @@ class TransactionDialog(tk.Toplevel):
         bc = StyledFrame(bf); bc.pack(expand=True)
         color_bg = BUTTON_BG if self.txn_type == 'purchase' else WARNING_BG
         tk.Button(bc,text=f"Record {self.txn_type.capitalize()}",command=self.record,
-                  bg=color_bg,fg="white",width=18).pack(side='left',padx=10)
+                bg=color_bg,fg="white",width=18).pack(side='left',padx=10)
         tk.Button(bc,text="Cancel",command=self.destroy,
-                  bg="#95a5a6",fg="white",width=10).pack(side='left',padx=10)
+                bg="#95a5a6",fg="white",width=10).pack(side='left',padx=10)
         self.qty_entry.focus()
         self.bind('<Return>', lambda e: self.record())
 
