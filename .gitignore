@@ -6,3 +6,8 @@ __pycache__/
 *.db-shm
 *.db-wal
 "@ | Out-File -FilePath .gitignore -Encoding utf8
+__pycache__/
+*.db
+*.pyc
+item_images/*.jpg
+item_images/*.png
