@@ -3,6 +3,7 @@ import os
 import json
 from google import genai
 from google.genai import types
+from PIL import Image
 
 st.set_page_config(page_title="AI Clothing Management System", page_icon="👕", layout="centered")
 
@@ -12,6 +13,11 @@ st.write("Upload a clothing product image to automatically extract inventory met
 api_key = st.text_input("Enter Gemini API Key (or set environment variable):", type="password") or os.getenv("GEMINI_API_KEY")
 
 uploaded_file = st.file_uploader("Choose a clothing photo...", type=["jpg", "jpeg", "png"])
+
+if uploaded_file:
+    # Display preview image
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Clothing Item", use_column_width=True)
 
 if uploaded_file and st.button("✨ Auto-Tag Item with AI"):
     if not api_key:
@@ -25,8 +31,12 @@ if uploaded_file and st.button("✨ Auto-Tag Item with AI"):
             Do not output markdown formatting.
             """
             
+            # Reset file stream position
+            uploaded_file.seek(0)
             image_bytes = uploaded_file.read()
-            response = client.models.generateContent(
+            
+            # Corrected method name: generate_content
+            response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=[
                     types.Part.from_bytes(data=image_bytes, mime_type=uploaded_file.type),
